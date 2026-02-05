@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Manager Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@1.5.3/dist/jspdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+            --danger: #ef4444;
+            --success: #10b981;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        .header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+
+        /* Tab Navigation */
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 14px 28px;
+            background: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Main Content Area */
+        .content-area {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            min-height: 600px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-area.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Form Styles */
+        .form-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .form-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+
+        .input-field, .textarea-field {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--light-gray);
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .textarea-field {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .input-field:focus, .textarea-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Section Cards */
+        .section-card {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            color: var(--dark);
+        }
+
+        /* Tag and Subject Input */
+        .tag-container, .subject-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tag, .subject-option {
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .tag:hover, .subject-option:hover {
+            background: var(--primary-dark);
+        }
+
+        .tag.selected, .subject-option.selected {
+            background: var(--secondary);
+        }
+
+        .tag i, .subject-option i {
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .add-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-btn:hover {
+            background: #0da271;
+        }
+
+        .input-with-btn {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed var(--light-gray);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+            display: none;
+        }
+
+        .file-upload.active {
+            display: block;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .file-upload i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .media-preview {
+            margin-top: 15px;
+            max-width: 100%;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .media-preview.active {
+            display: block;
+        }
+
+        /* Question List */
+        .questions-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: var(--transition);
+            border: 1px solid var(--light-gray);
+            cursor: pointer;
+        }
+
+        .question-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .question-card.expanded {
+            grid-column: 1 / -1;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .question-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            color: var(--dark);
+            margin-right: 15px;
+        }
+
+        .question-meta {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            background: var(--light);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .question-content {
+            color: var(--gray);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .question-card.expanded .question-content {
+            display: block;
+        }
+
+        .question-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .question-card:hover .question-actions,
+        .question-card.expanded .question-actions {
+            opacity: 1;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .edit-btn {
+            background: var(--accent);
+            color: white;
+        }
+
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+        }
+
+        .export-btn {
+            background: var(--success);
+            color: white;
+        }
+
+        /* Floating Action Button */
+        .fab-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        .fab {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+            transition: var(--transition);
+            border: none;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--card-shadow);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: var(--danger);
+        }
+
+        /* Export Options */
+        .export-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .export-option-btn {
+            padding: 12px 20px;
+            background: var(--light);
+            border: 2px solid var(--light-gray);
+            border-radius: 10px;
+            font-weight: 600;
+            color: var(--dark);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .export-option-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Checkbox for export selection */
+        .export-checkbox {
+            margin-right: 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content-area {
+                padding: 20px;
+            }
+            
+            .questions-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .tab-btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .fab-container {
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .fab {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.7rem;
+            }
+            
+            .tab-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .tab-btn {
+                justify-content: center;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .input-with-btn {
+                flex-direction: column;
+            }
+        }
+
+        /* Loading Animation */
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loader.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--light-gray);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--success);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            z-index: 1001;
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.error {
+            background: var(--danger);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--light-gray);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>Question Manager Pro</h1>
+            <p>Organize, store, and manage all your questions in one beautiful interface</p>
+        </div>
+
+        <div class="tab-container">
+            <button class="tab-btn active" data-tab="add-question">
+                <i class="fas fa-plus-circle"></i> Add Question
+            </button>
+            <button class="tab-btn" data-tab="view-questions">
+                <i class="fas fa-eye"></i> View Questions
+            </button>
+            <button class="tab-btn" data-tab="export-questions">
+                <i class="fas fa-file-export"></i> Export Questions
+            </button>
+        </div>
+
+        <!-- Add Question Tab -->
+        <div class="content-area active" id="add-question">
+            <div class="form-container">
+                <h2 class="form-title">Add New Question</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">Question *</label>
+                    <input type="text" id="question-input" class="input-field" placeholder="Enter your question here...">
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3 class="section-title">Introduction</h3>
+                        <button type="button" class="add-btn" onclick="toggleMedia('intro')">
+                            <i class="fas fa-paperclip"></i> Add Media
+                        </button>
+                    </div>
+                    <textarea id="intro-input" class="textarea-field" placeholder="Add introduction (optional)..."></textarea>
+                    <div id="intro-media-container" class="file-upload">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload images or PDF (optional)</p>
+                        <input type="file" id="intro-file" accept="image/*,.pdf" style="display: none;" onchange="handleFileUpload('intro', this)">
+                    </div>
+                    <img id="intro-preview" class="media-preview" alt="Preview">
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3 class="section-title">Body</h3>
+                        <button type="button" class="add-btn" onclick="toggleMedia('body')">
+                            <i class="fas fa-paperclip"></i> Add Media
+                        </button>
+                    </div>
+                    <textarea id="body-input" class="textarea-field" placeholder="Add detailed body (optional)..."></textarea>
+                    <div id="body-media-container" class="file-upload">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload images or PDF (optional)</p>
+                        <input type="file" id="body-file" accept="image/*,.pdf" style="display: none;" onchange="handleFileUpload('body', this)">
+                    </div>
+                    <img id="body-preview" class="media-preview" alt="Preview">
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3 class="section-title">Conclusion</h3>
+                        <button type="button" class="add-btn" onclick="toggleMedia('conclusion')">
+                            <i class="fas fa-paperclip"></i> Add Media
+                        </button>
+                    </div>
+                    <textarea id="conclusion-input" class="textarea-field" placeholder="Add conclusion (optional)..."></textarea>
+                    <div id="conclusion-media-container" class="file-upload">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload images or PDF (optional)</p>
+                        <input type="file" id="conclusion-file" accept="image/*,.pdf" style="display: none;" onchange="handleFileUpload('conclusion', this)">
+                    </div>
+                    <img id="conclusion-preview" class="media-preview" alt="Preview">
+                </div>
+
+                <div class="section-card">
+                    <h3 class="section-title">Subject</h3>
+                    <div class="subject-container" id="subject-container">
+                        <!-- Subjects will be loaded here -->
+                    </div>
+                    <div class="input-with-btn">
+                        <input type="text" id="new-subject" class="input-field" placeholder="Add new subject...">
+                        <button type="button" class="add-btn" onclick="addNewSubject()">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <h3 class="section-title">Tags</h3>
+                    <div class="tag-container" id="tag-container">
+                        <!-- Tags will be loaded here -->
+                    </div>
+                    <div class="input-with-btn">
+                        <input type="text" id="new-tag" class="input-field" placeholder="Add new tag...">
+                        <button type="button" class="add-btn" onclick="addNewTag()">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+
+                <button class="fab" onclick="saveQuestion()" style="margin: 30px auto 0; display: block; position: static;">
+                    <i class="fas fa-save"></i> Save Question
+                </button>
+            </div>
+        </div>
+
+        <!-- View Questions Tab -->
+        <div class="content-area" id="view-questions">
+            <h2 class="form-title">All Questions</h2>
+            <div class="questions-list" id="questions-list">
+                <div class="empty-state" id="empty-state">
+                    <i class="fas fa-question-circle"></i>
+                    <h3>No questions yet</h3>
+                    <p>Add your first question using the "Add Question" tab!</p>
+                </div>
+            </div>
+            <div class="loader" id="questions-loader">
+                <div class="spinner"></div>
+                <p>Loading questions...</p>
+            </div>
+        </div>
+
+        <!-- Export Questions Tab -->
+        <div class="content-area" id="export-questions">
+            <h2 class="form-title">Export Questions</h2>
+            <div class="export-options">
+                <button class="export-option-btn" onclick="exportSelectedQuestions()">
+                    <i class="fas fa-file-pdf"></i> Export Selected
+                </button>
+                <button class="export-option-btn" onclick="exportAllQuestions()">
+                    <i class="fas fa-file-archive"></i> Export All
+                </button>
+                <button class="export-option-btn" onclick="clearSelections()">
+                    <i class="fas fa-times"></i> Clear Selections
+                </button>
+            </div>
+            <div class="questions-list" id="export-questions-list">
+                <!-- Questions for export will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for editing question -->
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Question</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="edit-form-container">
+                <!-- Edit form will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <div class="fab-container">
+        <button class="fab" id="main-fab" onclick="showQuickActions()">
+            <i class="fas fa-bolt"></i>
+        </button>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Operation completed successfully!</span>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loader" id="global-loader">
+        <div class="spinner"></div>
+        <p>Processing...</p>
+    </div>
+
+    <script>
+        // Google Sheets Configuration
+        const SPREADSHEET_ID = '14Y_nUHlD6TIlVKvoCKSnyEAwm5K6LtnP5I8yeDXQdDM';
+        const SHEET_NAME = 'Sheet1';
+        const API_KEY = 'AIzaSyDyHv8jTQoZmiWQq7LjQqMp7RcNZ6rJcYk'; // Note: In production, use a restricted API key
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxLrHSOaj54MSfzA_yfTVATFrI43bU-rcTb9aJ-6kg3mqL1rDf9Un8Xef5AVt6PXW0m/exec';
+
+        // Global Variables
+        let currentQuestions = [];
+        let selectedSubject = '';
+        let selectedTags = new Set();
+        let mediaFiles = {
+            intro: null,
+            body: null,
+            conclusion: null
+        };
+
+        // Pre-installed data
+        const defaultSubjects = ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'History', 'Geography'];
+        const defaultTags = ['Important', 'Exam', 'Homework', 'Theory', 'Practice', 'Project'];
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+            loadQuestions();
+        });
+
+        function initializeApp() {
+            // Initialize subjects
+            const subjectContainer = document.getElementById('subject-container');
+            defaultSubjects.forEach(subject => {
+                const subjectElement = document.createElement('div');
+                subjectElement.className = 'subject-option';
+                subjectElement.textContent = subject;
+                subjectElement.onclick = () => selectSubject(subject);
+                subjectContainer.appendChild(subjectElement);
+            });
+
+            // Initialize tags
+            const tagContainer = document.getElementById('tag-container');
+            defaultTags.forEach(tag => {
+                const tagElement = document.createElement('div');
+                tagElement.className = 'tag';
+                tagElement.textContent = tag;
+                tagElement.onclick = () => toggleTag(tag);
+                tagContainer.appendChild(tagElement);
+            });
+
+            // Load saved data from localStorage
+            loadFromLocalStorage();
+        }
+
+        function setupEventListeners() {
+            // Tab switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.dataset.tab;
+                    switchTab(tab);
+                });
+            });
+
+            // Form submission
+            document.getElementById('question-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    saveQuestion();
+                }
+            });
+        }
+
+        function switchTab(tabName) {
+            // Update active tab button
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.tab === tabName) btn.classList.add('active');
+            });
+
+            // Show active content area
+            document.querySelectorAll('.content-area').forEach(area => {
+                area.classList.remove('active');
+                if (area.id === tabName) area.classList.add('active');
+            });
+
+            // Load data for specific tabs
+            if (tabName === 'view-questions') {
+                loadQuestions();
+            } else if (tabName === 'export-questions') {
+                loadQuestionsForExport();
+            }
+        }
+
+        // Subject and Tag Management
+        function selectSubject(subject) {
+            selectedSubject = subject;
+            document.querySelectorAll('.subject-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.textContent === subject) opt.classList.add('selected');
+            });
+        }
+
+        function toggleTag(tag) {
+            const tagElement = [...document.querySelectorAll('.tag')]
+                .find(t => t.textContent === tag);
+            
+            if (selectedTags.has(tag)) {
+                selectedTags.delete(tag);
+                tagElement.classList.remove('selected');
+            } else {
+                selectedTags.add(tag);
+                tagElement.classList.add('selected');
+            }
+        }
+
+        function addNewSubject() {
+            const input = document.getElementById('new-subject');
+            const subject = input.value.trim();
+            
+            if (subject && !defaultSubjects.includes(subject)) {
+                const subjectContainer = document.getElementById('subject-container');
+                const subjectElement = document.createElement('div');
+                subjectElement.className = 'subject-option';
+                subjectElement.textContent = subject;
+                subjectElement.onclick = () => selectSubject(subject);
+                subjectContainer.appendChild(subjectElement);
+                
+                input.value = '';
+                showToast('Subject added successfully!');
+            }
+        }
+
+        function addNewTag() {
+            const input = document.getElementById('new-tag');
+            const tag = input.value.trim();
+            
+            if (tag && !defaultTags.includes(tag)) {
+                const tagContainer = document.getElementById('tag-container');
+                const tagElement = document.createElement('div');
+                tagElement.className = 'tag';
+                tagElement.textContent = tag;
+                tagElement.onclick = () => toggleTag(tag);
+                tagContainer.appendChild(tagElement);
+                
+                input.value = '';
+                showToast('Tag added successfully!');
+            }
+        }
+
+        // Media Handling
+        function toggleMedia(section) {
+            const container = document.getElementById(`${section}-media-container`);
+            container.classList.toggle('active');
+        }
+
+        function triggerFileUpload(section) {
+            document.getElementById(`${section}-file`).click();
+        }
+
+        function handleFileUpload(section, input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+            if (!validTypes.includes(file.type)) {
+                showToast('Please upload only images or PDF files', 'error');
+                return;
+            }
+
+            // Validate file size (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('File size should be less than 5MB', 'error');
+                return;
+            }
+
+            mediaFiles[section] = file;
+
+            // Show preview for images
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById(`${section}-preview`);
+                    preview.src = e.target.result;
+                    preview.classList.add('active');
+                };
+                reader.readAsDataURL(file);
+            }
+
+            showToast(`${section.charAt(0).toUpperCase() + section.slice(1)} file uploaded!`);
+        }
+
+        // Save Question to Google Sheets
+        async function saveQuestion() {
+            const question = document.getElementById('question-input').value.trim();
+            if (!question) {
+                showToast('Please enter a question', 'error');
+                return;
+            }
+
+            showLoader();
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'save');
+                formData.append('question', question);
+                formData.append('introduction', document.getElementById('intro-input').value);
+                formData.append('body', document.getElementById('body-input').value);
+                formData.append('conclusion', document.getElementById('conclusion-input').value);
+                formData.append('subject', selectedSubject);
+                formData.append('tags', Array.from(selectedTags).join(','));
+                
+                // Add media files if they exist
+                if (mediaFiles.intro) formData.append('introFile', mediaFiles.intro);
+                if (mediaFiles.body) formData.append('bodyFile', mediaFiles.body);
+                if (mediaFiles.conclusion) formData.append('conclusionFile', mediaFiles.conclusion);
+
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Also save to localStorage as backup
+                    saveToLocalStorage({
+                        id: Date.now().toString(),
+                        question,
+                        introduction: document.getElementById('intro-input').value,
+                        body: document.getElementById('body-input').value,
+                        conclusion: document.getElementById('conclusion-input').value,
+                        subject: selectedSubject,
+                        tags: Array.from(selectedTags),
+                        timestamp: new Date().toISOString()
+                    });
+
+                    // Clear form
+                    clearForm();
+                    showToast('Question saved successfully!');
+                    
+                    // Reload questions if on view tab
+                    if (document.getElementById('view-questions').classList.contains('active')) {
+                        loadQuestions();
+                    }
+                } else {
+                    throw new Error(result.error || 'Failed to save question');
+                }
+            } catch (error) {
+                console.error('Error saving question:', error);
+                showToast('Failed to save question. Saving to local storage.', 'error');
+                
+                // Save to localStorage as fallback
+                saveToLocalStorage({
+                    id: Date.now().toString(),
+                    question,
+                    introduction: document.getElementById('intro-input').value,
+                    body: document.getElementById('body-input').value,
+                    conclusion: document.getElementById('conclusion-input').value,
+                    subject: selectedSubject,
+                    tags: Array.from(selectedTags),
+                    timestamp: new Date().toISOString()
+                });
+                
+                clearForm();
+                loadQuestions();
+            } finally {
+                hideLoader();
+            }
+        }
+
+        // Load Questions from Google Sheets
+        async function loadQuestions() {
+            showLoader('questions-loader');
+            document.getElementById('empty-state').style.display = 'none';
+
+            try {
+                // Try to load from Google Sheets first
+                const response = await fetch(`${SCRIPT_URL}?action=get`);
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    currentQuestions = result.data;
+                    displayQuestions(currentQuestions);
+                } else {
+                    // Fallback to localStorage
+                    loadFromLocalStorage();
+                }
+            } catch (error) {
+                console.error('Error loading questions:', error);
+                // Fallback to localStorage
+                loadFromLocalStorage();
+            } finally {
+                hideLoader('questions-loader');
+            }
+        }
+
+        function displayQuestions(questions) {
+            const container = document.getElementById('questions-list');
+            
+            if (!questions || questions.length === 0) {
+                document.getElementById('empty-state').style.display = 'block';
+                container.innerHTML = '';
+                return;
+            }
+
+            document.getElementById('empty-state').style.display = 'none';
+            
+            container.innerHTML = questions.map((q, index) => `
+                <div class="question-card" onclick="toggleQuestionExpansion(${index})">
+                    <div class="question-header">
+                        <h3 class="question-title">${q.question || 'Untitled Question'}</h3>
+                        <span class="meta-item">${q.subject || 'No Subject'}</span>
+                    </div>
+                    <div class="question-meta">
+                        ${q.tags ? q.tags.split(',').map(tag => 
+                            `<span class="meta-item">${tag.trim()}</span>`
+                        ).join('') : ''}
+                    </div>
+                    <div class="question-content">
+                        ${q.introduction ? `<p><strong>Introduction:</strong> ${q.introduction}</p>` : ''}
+                        ${q.body ? `<p><strong>Body:</strong> ${q.body}</p>` : ''}
+                        ${q.conclusion ? `<p><strong>Conclusion:</strong> ${q.conclusion}</p>` : ''}
+                        <div class="question-actions">
+                            <button class="action-btn edit-btn" onclick="event.stopPropagation(); editQuestion(${index})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="action-btn delete-btn" onclick="event.stopPropagation(); deleteQuestion(${index})">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                            <button class="action-btn export-btn" onclick="event.stopPropagation(); exportSingleQuestion(${index})">
+                                <i class="fas fa-file-pdf"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleQuestionExpansion(index) {
+            const card = document.querySelectorAll('.question-card')[index];
+            card.classList.toggle('expanded');
+        }
+
+        // Edit Question
+        function editQuestion(index) {
+            const question = currentQuestions[index];
+            const modal = document.getElementById('edit-modal');
+            const container = document.getElementById('edit-form-container');
+            
+            container.innerHTML = `
+                <div class="form-group">
+                    <label class="form-label">Question</label>
+                    <input type="text" id="edit-question" class="input-field" value="${question.question || ''}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Introduction</label>
+                    <textarea id="edit-intro" class="textarea-field">${question.introduction || ''}</textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Body</label>
+                    <textarea id="edit-body" class="textarea-field">${question.body || ''}</textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Conclusion</label>
+                    <textarea id="edit-conclusion" class="textarea-field">${question.conclusion || ''}</textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Subject</label>
+                    <input type="text" id="edit-subject" class="input-field" value="${question.subject || ''}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tags (comma separated)</label>
+                    <input type="text" id="edit-tags" class="input-field" value="${question.tags || ''}">
+                </div>
+                <button class="fab" onclick="updateQuestion(${index})" style="margin-top: 20px;">
+                    <i class="fas fa-save"></i> Update Question
+                </button>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        async function updateQuestion(index) {
+            showLoader();
+            
+            try {
+                const updatedQuestion = {
+                    id: currentQuestions[index].id,
+                    question: document.getElementById('edit-question').value,
+                    introduction: document.getElementById('edit-intro').value,
+                    body: document.getElementById('edit-body').value,
+                    conclusion: document.getElementById('edit-conclusion').value,
+                    subject: document.getElementById('edit-subject').value,
+                    tags: document.getElementById('edit-tags').value,
+                    timestamp: new Date().toISOString()
+                };
+
+                // Update in Google Sheets
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'update',
+                        data: updatedQuestion
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Update local data
+                    currentQuestions[index] = updatedQuestion;
+                    displayQuestions(currentQuestions);
+                    closeModal();
+                    showToast('Question updated successfully!');
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Error updating question:', error);
+                showToast('Failed to update question', 'error');
+            } finally {
+                hideLoader();
+            }
+        }
+
+        // Delete Question
+        async function deleteQuestion(index) {
+            if (!confirm('Are you sure you want to delete this question?')) return;
+            
+            showLoader();
+            
+            try {
+                const questionId = currentQuestions[index].id;
+                
+                // Delete from Google Sheets
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'delete',
+                        id: questionId
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Remove from local data
+                    currentQuestions.splice(index, 1);
+                    displayQuestions(currentQuestions);
+                    showToast('Question deleted successfully!');
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Error deleting question:', error);
+                showToast('Failed to delete question', 'error');
+            } finally {
+                hideLoader();
+            }
+        }
+
+        // Export Functions
+        function loadQuestionsForExport() {
+            const container = document.getElementById('export-questions-list');
+            
+            if (!currentQuestions || currentQuestions.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-file-export"></i><h3>No questions to export</h3></div>';
+                return;
+            }
+            
+            container.innerHTML = currentQuestions.map((q, index) => `
+                <div class="question-card">
+                    <div class="question-header">
+                        <h3 class="question-title">${q.question || 'Untitled Question'}</h3>
+                        <input type="checkbox" class="export-checkbox" data-index="${index}">
+                    </div>
+                    <div class="question-meta">
+                        <span class="meta-item">${q.subject || 'No Subject'}</span>
+                        ${q.tags ? q.tags.split(',').map(tag => 
+                            `<span class="meta-item">${tag.trim()}</span>`
+                        ).join('') : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function exportSelectedQuestions() {
+            const checkboxes = document.querySelectorAll('.export-checkbox:checked');
+            if (checkboxes.length === 0) {
+                showToast('Please select questions to export', 'error');
+                return;
+            }
+
+            const indices = Array.from(checkboxes).map(cb => parseInt(cb.dataset.index));
+            const selectedQuestions = indices.map(i => currentQuestions[i]);
+            exportToPDF(selectedQuestions);
+        }
+
+        function exportAllQuestions() {
+            if (currentQuestions.length === 0) {
+                showToast('No questions to export', 'error');
+                return;
+            }
+            exportToPDF(currentQuestions);
+        }
+
+        function exportSingleQuestion(index) {
+            exportToPDF([currentQuestions[index]]);
+        }
+
+        function exportToPDF(questions) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            let yPos = 20;
+            
+            questions.forEach((q, qIndex) => {
+                if (qIndex > 0) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+                
+                // Add question
+                doc.setFontSize(16);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`Question ${qIndex + 1}: ${q.question}`, 20, yPos);
+                yPos += 15;
+                
+                // Add subject and tags
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`Subject: ${q.subject || 'Not specified'}`, 20, yPos);
+                yPos += 7;
+                
+                if (q.tags) {
+                    doc.text(`Tags: ${q.tags}`, 20, yPos);
+                    yPos += 7;
+                }
+                
+                yPos += 5;
+                
+                // Add introduction
+                if (q.introduction) {
+                    doc.setFontSize(12);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Introduction:', 20, yPos);
+                    yPos += 7;
+                    
+                    doc.setFontSize(11);
+                    doc.setFont('helvetica', 'normal');
+                    const introLines = doc.splitTextToSize(q.introduction, 170);
+                    doc.text(introLines, 20, yPos);
+                    yPos += (introLines.length * 7) + 5;
+                }
+                
+                // Add body
+                if (q.body) {
+                    doc.setFontSize(12);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Body:', 20, yPos);
+                    yPos += 7;
+                    
+                    doc.setFontSize(11);
+                    doc.setFont('helvetica', 'normal');
+                    const bodyLines = doc.splitTextToSize(q.body, 170);
+                    doc.text(bodyLines, 20, yPos);
+                    yPos += (bodyLines.length * 7) + 5;
+                }
+                
+                // Add conclusion
+                if (q.conclusion) {
+                    doc.setFontSize(12);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Conclusion:', 20, yPos);
+                    yPos += 7;
+                    
+                    doc.setFontSize(11);
+                    doc.setFont('helvetica', 'normal');
+                    const conclusionLines = doc.splitTextToSize(q.conclusion, 170);
+                    doc.text(conclusionLines, 20, yPos);
+                }
+            });
+            
+            // Save the PDF
+            doc.save(`questions_${new Date().toISOString().split('T')[0]}.pdf`);
+            showToast('PDF exported successfully!');
+        }
+
+        // Utility Functions
+        function clearForm() {
+            document.getElementById('question-input').value = '';
+            document.getElementById('intro-input').value = '';
+            document.getElementById('body-input').value = '';
+            document.getElementById('conclusion-input').value = '';
+            document.getElementById('new-subject').value = '';
+            document.getElementById('new-tag').value = '';
+            
+            // Reset media
+            Object.keys(mediaFiles).forEach(key => {
+                mediaFiles[key] = null;
+                document.getElementById(`${key}-preview`).classList.remove('active');
+                document.getElementById(`${key}-media-container`).classList.remove('active');
+            });
+            
+            // Reset selections
+            selectedSubject = '';
+            selectedTags.clear();
+            document.querySelectorAll('.subject-option.selected, .tag.selected').forEach(el => {
+                el.classList.remove('selected');
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('edit-modal').classList.remove('active');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function showLoader(loaderId = 'global-loader') {
+            document.getElementById(loaderId).classList.add('active');
+        }
+
+        function hideLoader(loaderId = 'global-loader') {
+            document.getElementById(loaderId).classList.remove('active');
+        }
+
+        function showQuickActions() {
+            // Toggle between different quick actions
+            const fab = document.getElementById('main-fab');
+            const icon = fab.querySelector('i');
+            
+            if (icon.classList.contains('fa-bolt')) {
+                icon.className = 'fas fa-plus';
+                saveQuestion();
+            } else if (icon.classList.contains('fa-plus')) {
+                icon.className = 'fas fa-sync';
+                loadQuestions();
+            } else {
+                icon.className = 'fas fa-bolt';
+                clearForm();
+            }
+        }
+
+        // Local Storage Functions (Fallback)
+        function saveToLocalStorage(question) {
+            let questions = JSON.parse(localStorage.getItem('questions')) || [];
+            questions.push(question);
+            localStorage.setItem('questions', JSON.stringify(questions));
+        }
+
+        function loadFromLocalStorage() {
+            const questions = JSON.parse(localStorage.getItem('questions')) || [];
+            if (questions.length > 0) {
+                currentQuestions = questions;
+                displayQuestions(questions);
+            }
+        }
+
+        function clearSelections() {
+            document.querySelectorAll('.export-checkbox').forEach(cb => {
+                cb.checked = false;
+            });
+        }
+    </script>
+</body>
+</html>
